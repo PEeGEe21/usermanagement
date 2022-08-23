@@ -1,0 +1,93 @@
+body {
+  padding: 0;
+  margin: 0;
+  top: 0!important;
+  position: relative !important;
+  height: 100%;
+}
+
+nav a {
+  text-decoration: none;
+  color: #fff;
+  /* margin-bottom: 10px ; */
+  /* padding: 10px 5px; */
+  font-size: 16px;
+}
+
+.login-form input {
+  box-shadow: none;
+  outline: none;
+  height: 50px;
+}
+.login-form input.form-control:focus,
+.login-form input.form-control:active,
+.login-form input.form-control:focus-within {
+  box-shadow: none;
+  outline: none;
+  border: none;
+}
+
+.text-underline {
+  text-decoration: underline;
+}
+
+nav .dropdown-toggler:hover {
+  background: rgb(31 41 55);
+}
+nav .dropdown_menu {
+  background: rgb(229 231 235);
+  display: none;
+}
+nav .dropdown.show .dropdown_menu {
+  background: rgb(229 231 235);
+  display: block;
+}
+
+.dropdown_menu .dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 14px;
+}
+
+.dropdown_menu .dropdown-item:hover {
+  background: #eee;
+}
+
+
+@media (min-width: 768px){
+.md-px-12 {
+    padding-left: 3rem !important;
+    padding-right: 3rem !important; 
+}
+}
+
+
+tr td,
+th{
+  text-align: left !important;
+}
+
+.btn.btn-sm{
+  font-size: 12px;
+}
+
+.showAddUserFormBtn{
+  box-shadow: none;
+  outline: none;
+
+  
+}
+.showAddUserFormBtn:focus,
+.showAddUserFormBtn:active{
+  box-shadow: none;
+  outline: none;
+}
+
+nav a{
+  transition: all 300ms ease-out;
+}
+nav a:hover{
+  transition: all 300ms ease-out;
+}
+.active { color: rgb(231, 142, 157); }
