@@ -54,3 +54,29 @@ Schema::create('admins', function (Blueprint $table) {
                     </table>
                  
                 </div>
+
+
+
+
+
+
+            
+        
+            <header class="d-flex align-items-center justify-content-end py-3 px-2 shadow-sm gap-4">
+                <div class="d-flex align-items-start flex-column gap-1">
+                    <h4 class="my-0" style="font-size: 20px;">{{loggedInUser.name}}</h4>
+                    <h5 class="" style="font-size: 12px;">{{loggedInUser.roles[0].name}}</h5>
+                </div>
+                
+                <button class="btn btn-sm btn-dark" ng-click="logout()">
+                    <span>
+
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.89844 7.55999C9.20844 3.95999 11.0584 2.48999 15.1084 2.48999H15.2384C19.7084 2.48999 21.4984 4.27999 21.4984 8.74999V15.27C21.4984 19.74 19.7084 21.53 15.2384 21.53H15.1084C11.0884 21.53 9.23844 20.08 8.90844 16.54" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M15.0011 12H3.62109" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5.85 8.6499L2.5 11.9999L5.85 15.3499" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+    
+                    </span>
+                    Logout</button>
+            </header>

@@ -1,25 +1,34 @@
-myApp.controller('loginController', ['$scope', '$http', function($scope, $http){
+myApp.controller('loginController', ['$scope', '$http', '$location', 'loginService', function($scope, $http, $location, loginService){
     $scope.name = 'PraiseGod'
 
-    $scope.show = 'false'
-    $scope.selected = [];
-    $scope.filterName = [];
 
 
-     
-    // function success(desserts) {
-    //     $scope.desserts = desserts;
-    // }
+
+
+        $scope.login = function() {
+            loginService.login(
+                $scope.email, $scope.password,
+                function(response){
+                    // alert('It stopped here');
+                    if(response.data.success === false){
+                        $scope.loginerror = response.data.message;
+                    }else{
+                        $location.path('/');
+                    }
+
+                    // console.log(response);
+                },
+                function(response){
+                    alert('Something went wrong with the login process. Try again later!');
+                }
+            );
+        }
     
-    // $http.get('data/data.json').success(function(result){
-    //   console.log($scope.nutritions = result);
-    // }).error(function(data, status){
-    //   console.log(data);
-    // })
-
-    // $scope.getDesserts = function () {
-    //    $scope.promise = $nutrition.desserts.get($scope.query, success).$promise;
-    // };
-
+        $scope.email = '';
+        $scope.password = '';
+    
+        if(loginService.checkIfLoggedIn())
+            $location.path('/');
+    
 
 }]);

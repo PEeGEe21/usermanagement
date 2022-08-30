@@ -25,22 +25,50 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, User $user)
     {
-        $users = User::with('roles')->orderBy('id','ASC')->paginate(5);        
+        // $users = User::with('roles')->orderBy('id','ASC')->paginate(50);  
+        
+        $userQuery = $user->newQuery();
+        $userQuery->with('roles');
+        $userQuery->whereHas(
+            'roles', function($q){
+                $q->where('name','!=', 'Admin');
+            }
+        );
 
-        return response()->json(['message'=> 'Successfull', 'users' => $users]);
+        $users = !empty( $request->input('searchText') ) ? $userQuery->where('name', $request->input('searchText'))->orWhere('email', $request->input('searchText')) : $userQuery;
+
+        $users = !empty( $request->input('limit') ) ? $users->paginate( $request->input('limit') ) : $users->paginate(5);
+          
+
+        return response()->json($users);
     }
     
     /**
-     * Show the form for creating a new resource.
+     * S
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function noOfStudents(Request $request)
     {
-        // $roles = Role::pluck('name','name')->all();
-        // return view('users.create',compact('roles'));
+        $students = User::whereHas(
+            'roles', function($q){
+                $q->where('name', 'Student');
+            }
+        )->get()->count();
+        return response()->json(['students' => $students]);
+    }
+
+
+    public function noOfParents(Request $request)
+    {
+        $parents = User::whereHas(
+            'roles', function($q){
+                $q->where('name', 'Parent');
+            }
+        )->get()->count();
+        return response()->json(['parents' => $parents]);
     }
     
     /**
@@ -126,16 +154,72 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
+        // $data = $request->all();
+        // dd($request->roles);
+
+        $user = User::find($id);
+
+
+        $user->update([
+            'name'=>$request['name'],
+            'email'=>$request['email'],
+        ]);
+        // $user->name = $request['name'];
+        // $user->email = $request['email'];
+        // $user->update();
+        // if($user){
+            // dd($user);
+            $user->roles()->sync($request->roles['0']['id'], $request->roles['0']['name']);
+
+        // }
+        // dd($user);
+        // dd($request->roles['0']['id']);
+        // $user->roles()->sync($request->roles);
+        
+
+
+
+
+
+
+
+
+
+
+
+
         // $this->validate($request, [
         //     'name' => 'required',
         //     'email' => 'required|email|unique:users,email,',
         //     'role' => 'required'
         // ]);
 
+        // dd($request['roles']['0']['id']);
 
-        $user = User::findOrFail($id);
-
-        $user->update(request()->all());
+        // $newRole = Role::findOrFail($request['roles']['0']['id']);
+        // $user = User::with('roles')->findOrFail($id);
+        // $user->name = $data['name'];
+        // $user->email = $data['email'];
+        // // 4role = Rolepivot::find()
+        // $user->roles[0]->role_id = $request['roles']['0']['id'];
+        // $user->roles[0]->name = $newRole->name;
+        // $user->roles[0]->pivot->role_id = $request['roles']['0']['id'];
+        // $user->save();
+        // $user->update([
+        //     'name'=>$data['name'],
+        //     'email'=>$data['email'],
+        // ]);
+        // if($user){
+        //     // \dd($user->roles[0]->role_id );
+        //     $role = $user->roles[0]->role_id = $request['roles']['0']['id'];
+        //     $user->save();
+        //     // $role = collect($user->roles)->toArray();
+        //     // $newRole = Role::findOrFail($role[0]['id']);
+        //     // $newRole->update([
+        //     //     'role_id' => $request['roles']['0']['id']
+        //     // ]);
+            
+        // }
     
         // $user = User::find($id);
 
@@ -145,6 +229,8 @@ class UserController extends Controller
         // DB::table('model_has_roles')->where('model_id',$id)->delete();
     
         // $user->assignRole($request->input('roles'));
+        $user = User::with('roles')->where('id','=',$id)->get();
+        $user = $user[0];
 
         return response()->json([
             'message'=> 'User updated successfully', 

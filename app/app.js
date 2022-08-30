@@ -1,12 +1,15 @@
-var myApp = angular.module("myApp", ['ui.router', 'ngMaterial', 'md.data.table', 'fixed.table.header']);
+var myApp = angular.module("myApp", ['ui.router', 'ngMaterial', 'md.data.table', 'fixed.table.header', 'LocalStorageModule']);
 
 
-myApp.config(function($stateProvider ) {
+  
+
+
+myApp.config(function($stateProvider, $urlRouterProvider ) {
     var helloState = {
       name: 'home',
       url: '/',
       templateUrl: 'pages/main.html',
-      controller: 'appController'
+      controller: 'mainController'
 
     }
   
@@ -27,6 +30,9 @@ myApp.config(function($stateProvider ) {
     $stateProvider.state(helloState);
     $stateProvider.state(userState);
     $stateProvider.state(loginState);
+
+    $urlRouterProvider.otherwise('login');
+
   });
 
 //  myApp
@@ -47,9 +53,35 @@ myApp.config(function($stateProvider ) {
   
 
 
-myApp.controller('appController', function($scope){
+
+myApp.controller('appController', function($scope, $rootScope, $state, $location, loginService){
     $scope.hello = 'Hello World'
-    console.log("workinggg")
+
+    $scope.showSubMenu = true;
+
+    $scope.$watch(function(){
+        return $state.$current.name
+    }, function(currentStateName){
+      $scope.showSubMenu =  currentStateName === 'login' ? false : true;
+    }) 
+
+
+  $scope.logout = function(){
+    loginService.logout();
+    $location.path('/login');
+  }
+
+  // if(loginService.checkIfLoggedIn())
+  //   $scope.showSidebar = true
+
+  if(!loginService.checkIfLoggedIn())
+    $location.path('/login');
+
+
+
 });
+
+
+
 
 

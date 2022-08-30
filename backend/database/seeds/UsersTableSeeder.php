@@ -28,19 +28,39 @@ class UsersTableSeeder extends Seeder
             'email' => 'admin@admin.com',
             'password' => Hash::make('testing')
         ]);
+        $admin->roles()->attach($adminRole);
+
+
         $parent = User::create([
             'name' => 'Udeh Samuel',
             'email' => 'parent@parent.com',
             'password' => Hash::make('testing')
         ]);
+        $parent->roles()->attach($parentRole);
+
         $student = User::create([
             'name' => 'Udeh Evidence',
             'email' => 'student@student.com',
             'password' => Hash::make('testing')
         ]);
-        
-        $admin->roles()->attach($adminRole);
-        $parent->roles()->attach($parentRole);
         $student->roles()->attach($studentRole);
+
+        for($i =0; $i < 500000; $i++){
+            $student = User::create([
+                'name' => str_random(10),
+                'email' => 'student'.$i.'@gmail.com',
+                'password' => Hash::make('testing'),
+            ]);
+            $student->roles()->attach($studentRole);
+        }
+
+        for($i =0; $i < 500000; $i++){
+            $parent = User::create([
+                'name' => str_random(10),
+                'email' => 'parent'.$i.'@gmail.com',
+                'password' => Hash::make('testing'),
+            ]);
+            $parent->roles()->attach($parentRole);
+        }
     }
 }

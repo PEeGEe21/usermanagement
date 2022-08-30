@@ -23,8 +23,14 @@ Route::get('/test', function () {
 
 Route::post('users/create', 'UserController@store');
 Route::get('users', 'UserController@index');
+Route::get('users/students', 'UserController@noOfStudents');
+Route::get('users/parents', 'UserController@noOfParents');
 Route::get('users/{id}', 'UserController@show');
-Route::post('users/delete/{id}', 'UserController@destroy');
+Route::post('users/{id}/update', 'UserController@update');
+Route::post('users/{id}/delete', 'UserController@destroy');
+
+
+Route::post('auth/login', 'Auth\LoginController@login');
 
 // Route::post('login', 'AuthApi@login');
 // Route::get('profile', 'AuthApi@getAuthenticatedUser');

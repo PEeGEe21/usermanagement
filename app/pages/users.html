@@ -1,13 +1,53 @@
+<div class="" style="margin-left: 200px; height: 100%; padding-bottom: 150px;" >
 
             
-            <header class="d-flex align-items-center justify-content-end py-3 px-2 shadow-sm">
-                <div class="d-flex align-items-start flex-column gap-1">
-                    <h4 class="my-0" style="font-size: 20px;">Praise</h4>
-                    <h5 class="" style="font-size: 14px;">Admin</h5>
+
+            <header class="d-flex align-items-center justify-content-end py-3 px-2 gap-4 shadow-sm">
+                <div class="dropdown relative mr-3" data-dropdown>
+                    <button class=" d-flex align-items-center justify-content-center dropdown-toggler cursor-pointer" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-dropdown-btn>
+                        <div class="d-flex align-items-start flex-column gap-1 pe-none">
+                            <h4 class="my-0 text-capitalize" style="font-size: 16px;">{{loggedInUser.name}}</h4>
+                            <h5 class="" style="font-size: 12px; font-weight: 400;">{{loggedInUser.roles[0].name}}</h5>
+                        </div>
+
+                        <span class="pe-none" style="height: 12px; width: 12px;">
+                            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="caret-down" class="w-100 h-100 ml-2" role="img" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    
+                                <path d="M8.00099 11.7C7.53432 11.7 7.06766 11.5201 6.71432 11.1667L2.36766 6.82005C2.17432 6.62672 2.17432 6.30672 2.36766 6.11338C2.56099 5.92005 2.88099 5.92005 3.07432 6.11338L7.42099 10.4601C7.74099 10.7801 8.26099 10.7801 8.58099 10.4601L12.9277 6.11338C13.121 5.92005 13.441 5.92005 13.6343 6.11338C13.8277 6.30672 13.8277 6.62672 13.6343 6.82005L9.28766 11.1667C8.93432 11.5201 8.46766 11.7 8.00099 11.7Z" fill="#4A4957"></path>
+                            </svg>
+                        </span>
+                        
+                        
+                    </button>
+            
+                        <div class=" dropdown_menu border-0  z-50 min-w-0 bg-neutral50 py-2 " aria-labelledby="dropdownMenuButton" >
+                            <button class=" dropdown-item d-flex align-items-center text-xs gap-2 py-2 px-2  btn-sm " ng-click="logout()">
+                                <span>
+            
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8.89844 7.55999C9.20844 3.95999 11.0584 2.48999 15.1084 2.48999H15.2384C19.7084 2.48999 21.4984 4.27999 21.4984 8.74999V15.27C21.4984 19.74 19.7084 21.53 15.2384 21.53H15.1084C11.0884 21.53 9.23844 20.08 8.90844 16.54" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M15.0011 12H3.62109" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.85 8.6499L2.5 11.9999L5.85 15.3499" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                
+                                </span>Logout
+                            </button>
+                            
+                            
+                        </div>
+                    </div> 
+                <!-- <div class="d-flex align-items-start flex-column gap-1">
+                    <h4 class="my-0" style="font-size: 20px;">{{loggedInUser.name}}</h4>
+                    <h5 class="" style="font-size: 12px;">{{loggedInUser.roles[0].name}}</h5>
                 </div>
+                <button class="btn btn-sm btn-dark" ng-click="logout()">Logout</button> -->
             </header>
             <div class="px-4 md-px-12" style="margin-top: 44px;">
-                <h3 class="pb-4">Users</h3>
+                <div class="pb-4 d-flex align-items-center justify-content-between">
+                    <h3 class="">Users</h3>
+                    
+                </div>
+                
 
 
                 
@@ -17,6 +57,25 @@
                 <md-toolbar class="md-table-toolbar md-default">
                     <div class="md-toolbar-tools">
                       <span>user table</span>
+
+                      <div>
+
+                      
+                        <md-input-container>
+                            <label> Search Table </label>
+                            <input ng-model="query.search"> 
+                        </md-input-container>
+
+                            <md-button class="md-raised md-primary" 
+                                    ng-click="searchFilter()"
+                                    ng-disabled="!query.search">
+                                <md-icon>search</md-icon>
+                            </md-button>
+
+                            <md-button class="md-icon-button "  ng-click="loadStuff()">
+                                <md-icon>refresh</md-icon>
+                            </md-button>
+                        </div>
                     </div>
 
                         <!-- <md-input-container style="margin:15px;">
@@ -31,7 +90,7 @@
                   </md-toolbar>
                   
                   <md-table-container>
-                    <table md-table md-row-select multiple ng-model="selected" class="position-relative" >
+                    <table md-table  ng-model="selected" class="position-relative" >
                       <thead md-head md-order="query.order">
                         <tr mdt-row="{
                             'data': filteredItems,
@@ -42,35 +101,36 @@
                           <th md-column md-numeric><span>Name</span></th>
                           <th md-column md-numeric>Email</th>
                           <th md-column md-numeric>Role</th>
-                          <th md-column md-numeric>Action</th>
+                          <th md-column md-numeric ng-show="{{loggedInUser.roles[0].id === 1 }}">Action</th>
                         </tr>
                       </thead>
                       <tbody md-body>
-                        <tr md-row md-select="user" md-select-id="id" md-auto-select ng-repeat="user in users" class="text-left">
-                            <td md-cell>{{user.id}}</td>
-                            <td md-cell>{{user.name}}</td>
+                        <tr md-row md-select="user" md-select-id="id" md-auto-select ng-repeat="user in users.data" class="text-left">
+                            <td md-cell>{{ (query.page*query.limit)+($index+1) - query.limit}}</td>
+                            <td md-cell class="text-capitalize">{{user.name}}</td>
                             <td md-cell>{{user.email}}</td>
-                            <td md-cell>{{user.roles[0].name}}</td>
-                            <td md-cell>
-                            <button class="btn btn-primary btn-sm">
+                            <td md-cell class="text-capitalize" >{{user.roles[0].name}}</td>
+                            <td md-cell ng-show="{{loggedInUser.roles[0].id === 1 }}">
+                            <button class="btn btn-primary btn-sm text-white" ng-click="editUser(user)" data-bs-toggle="modal" data-bs-target="#updateUserModal">
                                 <span>
+                                    <!-- #25252C #292D32 -->
                                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M6.63164 1.80011L2.52663 6.14511C2.37163 6.31011 2.22163 6.63511 2.19163 6.86011L2.00663 8.48011C1.94163 9.06511 2.36163 9.46511 2.94163 9.36511L4.55164 9.09011C4.77664 9.05011 5.09163 8.88511 5.24663 8.71511L9.35164 4.37011C10.0616 3.62011 10.3816 2.76511 9.27664 1.72011C8.17663 0.685108 7.34164 1.05011 6.63164 1.80011Z" stroke="#25252C" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M5.94531 2.5249C6.16031 3.9049 7.28031 4.9599 8.67031 5.0999" stroke="#25252C" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M1.5 11H10.5" stroke="#25252C" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M6.63164 1.80011L2.52663 6.14511C2.37163 6.31011 2.22163 6.63511 2.19163 6.86011L2.00663 8.48011C1.94163 9.06511 2.36163 9.46511 2.94163 9.36511L4.55164 9.09011C4.77664 9.05011 5.09163 8.88511 5.24663 8.71511L9.35164 4.37011C10.0616 3.62011 10.3816 2.76511 9.27664 1.72011C8.17663 0.685108 7.34164 1.05011 6.63164 1.80011Z" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.94531 2.5249C6.16031 3.9049 7.28031 4.9599 8.67031 5.0999" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M1.5 11H10.5" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
-                                </span> Edit
+                                </span> 
                             </button>
-                            <button class="btn btn-danger  btn-sm">
+                            <button class="btn btn-danger text-white btn-sm" ng-click="deleteCrib(user)">
                                 <span>
                                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M10.5 2.99023C8.835 2.82523 7.16 2.74023 5.49 2.74023C4.5 2.74023 3.51 2.79023 2.52 2.89023L1.5 2.99023" stroke="#292D32" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485" stroke="#292D32" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M9.42422 4.56982L9.09922 9.60482C9.04422 10.3898 8.99922 10.9998 7.60422 10.9998H4.39422C2.99922 10.9998 2.95422 10.3898 2.89922 9.60482L2.57422 4.56982" stroke="#292D32" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M5.16406 8.25H6.82906" stroke="#292D32" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M4.75 6.25H7.25" stroke="#292D32" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M10.5 2.99023C8.835 2.82523 7.16 2.74023 5.49 2.74023C4.5 2.74023 3.51 2.79023 2.52 2.89023L1.5 2.99023" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M9.42422 4.56982L9.09922 9.60482C9.04422 10.3898 8.99922 10.9998 7.60422 10.9998H4.39422C2.99922 10.9998 2.95422 10.3898 2.89922 9.60482L2.57422 4.56982" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.16406 8.25H6.82906" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M4.75 6.25H7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
-                                </span> Delete
+                                </span> 
                             </button>
                           </td> 
                         </tr>
@@ -81,15 +141,27 @@
                   <div class="position-relative">
                       <!-- <md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{users.count}}" md-on-paginate="getDesserts" md-page-select class="position-relative"></md-table-pagination> -->
 
-                      <md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{users.length}}" md-page-select class="position-relative"></md-table-pagination>
+                      <md-table-pagination 
+                        md-limit="query.limit"
+                        md-limit-options="limitOptions" 
+                        md-page="query.page" 
+                        md-total="{{users.total}}" 
+                        md-boundary-links="false"
+                        md-page-select="true" 
+                        md-on-paginate="logPagination"
+                        md-label="{{label}}" 
+                        class="position-relative">
+                    </md-table-pagination>
 
+                        <!-- md-total="{{model.users.total}}" -->
+                        
                   
                   </div>
                   
                 </div>  
-                <button class="btn btn-outline-primary mt-4 mb-4 showAddUserFormBtn" type="button"  data-bs-toggle="modal" data-bs-target="#exampleModal">Add User</button>
+                
                 <!-- <button class="btn btn-outline-primary mt-4 mb-4 showAddUserFormBtn" type="button" ng-click="showAddUserForm= !showAddUserForm" data-bs-toggle="modal" data-bs-target="#exampleModal">Add User</button> -->
-
+                <button class="btn btn-outline-primary mt-4 mb-4 showAddUserFormBtn" type="button"  data-bs-toggle="modal" data-bs-target="#addUserModal" ng-show="{{loggedInUser.roles[0].id === 1 }}">Add User</button>
 
                 <!-- <div class="row" ng-if="showAddUserForm">
 
@@ -131,20 +203,55 @@
                     </div>
                     
                 </div> -->
+                <!-- <div class="row" >
+
+                    <div class="col-lg-6 mt-5">
+                        <div class="card shadow-md px-4 py-5 mb-9">
+                            <form ng-submit="">
+                                <div>
+                                    <h4>Edit</h4>
+                                </div>
+                                <div class="mb-4">
+                                    <label>Name</label>
+                                    <input type="text" class="form-control" ng-model="existingUser.name"/>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label>Email</label>
+                                    <input type="email" class="form-control" ng-model="existingUser.email"/>
+                                </div>
+
+                                
+
+                                <div class="mb-4">
+                                    <label>Role</label>
+                                    <select class="form-control" ng-model="existingUser.roles[0].name">
+                                        <option value="1">Admin</option>
+                                        <option value="2">Parent</option>
+                                        <option value="3">Student</option>
+                                        
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary ">Update User</button>
+                            </form> 
+                        </div>
+                        
+                    </div>
+                    
+                </div> -->
 
 
 
   
-                    <!-- Modal -->
-                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <!-- New User Modal -->
+                    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
+                            <div class="modal-content py-4">
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
                                 <div class="modal-body">
                                     <form ng-submit="addUser()">
-                                        <div>
+                                        <div class="mb-3">
                                             <h4>Add a User</h4>
                                         </div>
                                         <div class="mb-4">
@@ -164,7 +271,7 @@
         
                                         <div class="mb-4">
                                             <label>Role</label>
-                                            <select class="form-control" ng-model="newUser.roles.id">
+                                            <select class="form-select" ng-model="newUser.roles.id" required>
                                                 <option value="1">Admin</option>
                                                 <option value="2">Parent</option>
                                                 <option value="3">Student</option>
@@ -175,10 +282,54 @@
                                         <button type="submit" class="btn btn-primary ">Add User</button>
                                     </form>  
                                 </div>
-                                <!-- <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary">Save changes</button>
-                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Update User Modal -->
+                    <div class="modal fade" id="updateUserModal" tabindex="-1" aria-labelledby="updateUserModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content py-4">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <div class="modal-body">
+                                    <form ng-submit="saveUserEdit(existingUser)">
+                                        <div class="mb-4">
+                                            <h4>Edit <span ng-model="existingUser.name">{{existingUser.name}}</span></h4>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label>Name</label>
+                                            <input type="text" class="form-control" ng-model="existingUser.name"/>
+                                        </div>
+        
+                                        <div class="mb-4">
+                                            <label>Email</label>
+                                            <input type="email" class="form-control" ng-model="existingUser.email"/>
+                                        </div>
+        
+                                        <!-- <div class="mb-4">
+                                            <label>Password</label>
+                                            <input type="password" class="form-control" ng-model="existingUser.password"/>
+                                        </div>  -->
+        
+                                        <div class="mb-4">
+                                            <label>Role</label>
+
+                                            <!-- <select class="form-select" multiple aria-label="multiple select example" ng-model="existingUser.roles">
+                                                <option value="1">Admin</option>
+                                                <option value="2">Parent</option>
+                                                <option value="3">Student</option>
+                                            </select> -->
+                                            <select class="form-select" ng-model="existingUser.roles[0].id">
+                                                <option value="1">Admin</option>
+                                                <option value="2">Parent</option>
+                                                <option value="3">Student</option>
+                                                
+                                            </select>
+                                        </div>
+        
+                                        <button type="submit" class="btn btn-primary " >Update User</button>
+                                    </form>  
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -193,3 +344,6 @@
                     $('#example').dataTable();
                 });
             </script> -->
+            
+
+</div>
