@@ -25,25 +25,45 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, User $user)
+
+
+
+
+
+    public function index(Request $request)
     {
         // $users = User::with('roles')->orderBy('id','ASC')->paginate(50);  
-        
-        $userQuery = $user->newQuery();
+        // dd($users);
+        // dd($request);
+
+        // $users = User::with('roles')->orderBy('id','ASC')->paginate(90000);
+        $userQuery = (new User)->query();
         $userQuery->with('roles');
         $userQuery->whereHas(
             'roles', function($q){
-                $q->where('name','!=', 'Admin');
+                $q->where('roles.id', '!=', Role::$admin);
             }
         );
 
-        $users = !empty( $request->input('searchText') ) ? $userQuery->where('name', $request->input('searchText'))->orWhere('email', $request->input('searchText')) : $userQuery;
+        if($request->input('searchText')){
+            $userQuery->where(function($query) use($request){
+                return $query->where('name', 'LIKE', '%'.$request->input('searchText').'%')
+                        ->orWhere('email', 'LIKE', '%'.$request->input('searchText').'%');
+            });
+        }
+        $limit = 10;
 
-        $users = !empty( $request->input('limit') ) ? $users->paginate( $request->input('limit') ) : $users->paginate(5);
+        if($request->input('limit')){
+            $limit = $request->input('limit');
+        }
+
+        $users = $userQuery->paginate($limit);
           
+        
 
         return response()->json($users);
     }
+    
     
     /**
      * S
@@ -87,21 +107,35 @@ class UserController extends Controller
         //     'password' => 'required|same:confirm-password',
         //     'roles' => ['required']
         // ]);
-    
+        // dd($request);
         $input = $request->all();
-        $input = $input['newUser'];
+        
+        // $input = $input['newUser'];
         $input['password'] = Hash::make($input['password']);
-    
+        $checkUser = User::with('roles')->where("email", $input['email'])->first();
+        if ($checkUser)
+            return response()->json(['success' => false, 'message'=> 'User already exists']);
+
         $user = User::create($input);
         if($user){
-            $role = Role::find($request['newUser']['roles']['id']);
+            $role = Role::find($request['role_id']);
             $user->roles()->attach($role);
         }
+        // $input = $request->all();
+        // dd($input);
+        // $input = $input['newUser'];
+        // $input['password'] = Hash::make($input['password']);
+    
+        // $user = User::create($input);
+        // if($user){
+        //     $role = Role::find($request['newUser']['role_id']);
+        //     $user->roles()->attach($role);
+        // }
 
         // $user->assignRole($request->input('roles'));
     
         
-        return response()->json(['message'=> 'User created', 'user' => $user]);
+        return response()->json(['success' => true, 'message'=> 'User created', 'user' => $user]);
         // $token = JWTAuth::fromUser($admin);
 
 

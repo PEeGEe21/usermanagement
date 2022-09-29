@@ -74,7 +74,7 @@ class LoginController extends Controller
                 $user = User::with('roles')->where("email", $request->email)->first();
 
                 return response()->json([
-                    // "status" => $this->status_code, 
+                    "status" => 200, 
                     "success" => true, 
                     "message" => "You have logged in successfully", 
                     "data" => $user

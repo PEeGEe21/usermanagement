@@ -80,3 +80,167 @@ Schema::create('admins', function (Blueprint $table) {
                     </span>
                     Logout</button>
             </header>
+
+
+
+
+
+public function index(Request $request)
+    {
+        // $users = User::with('roles')->orderBy('id','ASC')->paginate(50);
+        $userQuery = (new User)->query();
+        $userQuery->with('roles');
+        $userQuery->whereHas(
+            'roles', function($q){
+                $q->where('roles.id', '!=', Role::$admin);
+            }
+        );
+
+        if($request->input('searchText')){
+            $userQuery->where(function($query) use($request){
+                return $query->where('name', 'LIKE', '%'.$request->input('searchText').'%')
+                        ->orWhere('email', 'LIKE', '%'.$request->input('searchText').'%');
+            });
+        }
+        $limit = 10;
+
+        if($request->input('limit')){
+            $limit = $request->input('limit');
+        }
+
+        $users = $userQuery->paginate($limit);
+          
+        
+
+        return response()->json($users);
+    }
+
+
+
+    public function index(Request $request, User $user)
+    {
+        // $users = User::with('roles')->orderBy('id','ASC')->paginate(50);  
+        // dd('jjjjjj');
+        $userQuery = $user->newQuery();
+        // dd(User::first());
+        $userQuery->with('roles');
+        $userQuery->whereHas(
+            'roles', function($q){
+                $q->where('name','!=', 'Admin');
+            }
+        );
+// dd('jjjjjj');
+
+        
+        $users = !empty( $request->input('searchText') ) ? $userQuery->where('name', $request->input('searchText'))->orWhere('email', $request->input('searchText')) : $userQuery;
+
+        $users = !empty( $request->input('limit') ) ? $users->paginate( $request->input('limit') ) : $users->paginate(5);
+          
+        
+
+        return response()->json($users);
+    }
+    
+
+    public function index(Request $request)
+    {
+        // $users = User::with('roles')->orderBy('id','ASC')->paginate(50);  
+        // dd($users);
+
+        // $users = User::with('roles')->orderBy('id','ASC')->paginate(50);
+        $userQuery = (new User)->query();
+        $userQuery->with('roles');
+        $userQuery->whereHas(
+            'roles', function($q){
+                $q->where('roles.id', '!=', Role::$admin);
+            }
+        );
+
+        if($request->input('searchText')){
+            $userQuery->where(function($query) use($request){
+                return $query->where('name', 'LIKE', '%'.$request->input('searchText').'%')
+                        ->orWhere('email', 'LIKE', '%'.$request->input('searchText').'%');
+            });
+        }
+        $limit = 10;
+
+        if($request->input('limit')){
+            $limit = $request->input('limit');
+        }
+
+        $users = $userQuery->paginate($limit);
+          
+        
+
+        return response()->json($users);
+    }
+
+    <?php
+
+use Illuminate\Database\Seeder;
+use App\User;
+use App\Role;
+
+use Illuminate\Support\Facades\Hash;
+
+class UsersTableSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        User::truncate();
+        DB::table('role_user')->truncate();
+
+        $adminRole = Role::where('name', 'admin')->first();
+        $parentRole = Role::where('name', 'parent')->first();
+        $studentRole = Role::where('name', 'student')->first();
+
+
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('testing')
+        ]);
+        $admin->roles()->attach($adminRole);
+
+
+        $parent = User::create([
+            'name' => 'Udeh Samuel',
+            'email' => 'parent@parent.com',
+            'password' => Hash::make('testing')
+        ]);
+        $parent->roles()->attach($parentRole);
+
+        $student = User::create([
+            'name' => 'Udeh Evidence',
+            'email' => 'student@student.com',
+            'password' => Hash::make('testing')
+        ]);
+        $student->roles()->attach($studentRole);
+
+        for($i =0; $i < 500000; $i++){
+            $student = User::create([
+                'name' => str_random(10),
+                'email' => 'student'.$i.'@gmail.com',
+                'password' => Hash::make('testing'),
+            ]);
+            $student->roles()->attach($studentRole);
+        }
+
+        for($i =0; $i < 500000; $i++){
+            $parent = User::create([
+                'name' => str_random(10),
+                'email' => 'parent'.$i.'@gmail.com',
+                'password' => Hash::make('testing'),
+            ]);
+            $parent->roles()->attach($parentRole);
+        }
+        
+    }
+}
+
+

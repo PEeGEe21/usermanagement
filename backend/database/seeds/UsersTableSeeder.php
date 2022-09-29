@@ -62,5 +62,6 @@ class UsersTableSeeder extends Seeder
             ]);
             $parent->roles()->attach($parentRole);
         }
+        
     }
 }

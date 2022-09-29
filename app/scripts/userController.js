@@ -58,12 +58,21 @@ myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$time
 
     $scope.addUser = function(){
 
+      console.log($scope.newUser.name);
       $http.post('http://127.0.0.1:8000/api/users/create', {
-        newUser: $scope.newUser 
-      }).success(function(result){
-        $scope.newUser = {};
-        $scope.initPage();
-        $scope.resetForm();
+        name: $scope.newUser.name,
+        email: $scope.newUser.email,
+        password: $scope.newUser.password,
+        role_id: $scope.newUser.role_id,
+      }).success(function(res){
+        console.log(res);
+        alert(res.message);
+        
+        if(res.success == true){
+          $scope.newUser = {};
+          $scope.resetForm();
+        }
+        // $scope.initPage();
       }).error(function(data, status){
         console.log(data);
       })
@@ -87,7 +96,7 @@ myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$time
           loginService.updatestorage(result.user);
           window.location.reload();
         }
-        $scope.initPage();
+        // $scope.initPage();
         $scope.resetEditForm(user);
       }).error(function(data, status){
         console.log(data);

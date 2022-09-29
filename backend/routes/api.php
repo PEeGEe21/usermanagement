@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 // });
 
 Route::get('/test', function () {
-    return['movie'=> "Avengers"];
+    return ['movie' => "Avengers"];
 });
 
 Route::post('users/create', 'UserController@store');
