@@ -1,5 +1,9 @@
 
-myApp.factory('loginService', ['$http', 'localStorageService', function($http, localStorageService) {
+
+
+myApp.factory('loginService', ['$q', '$http', 'localStorageService', '$interval', '$injector', function($q, $http, localStorageService, $interval, $injector) {
+
+    var address = 'http://usermanagement.test'
 
     function checkIfLoggedIn() {
 
@@ -9,6 +13,79 @@ myApp.factory('loginService', ['$http', 'localStorageService', function($http, l
             return false;
 
     }
+
+
+    var refreshToken = function ()
+    {
+        var deferred = $q.defer();
+       
+        var authData = localStorageService.get('token');
+
+        if (authData) {
+
+            // var data = "grant_type=refresh_token&refresh_token=" + authData.refreshToken + "&client_id=" + ngAuthSettings.clientId;
+
+            // localStorageService.remove('token');
+
+            // $http = $http || $injector.get('$http');
+            $http.post(`${address}/api/refresh`).success(function (response) {
+                console.log('token', response.access_token)
+
+                // localStorageService.remove('token');
+                localStorageService.set('token', response.access_token);
+                localStorageService.set('expires_in', response.expires_in);
+
+                deferred.resolve(response);
+
+            }).error(function (err, status) {
+                console.log(err, "errorrr")
+                logout();
+                deferred.reject(err);
+            });
+        } else {
+            deferred.reject();
+        }
+
+        return deferred.promise;
+    };
+
+
+        // var getRefreshToken = function () {
+        //     refreshToken();
+        // }
+        // $interval(getRefreshToken, 60000); 
+
+
+      
+
+
+
+
+
+
+    // function getAuthorizationHeader() {
+                            
+    //       if (localStorageService.get('token') && localStorageService.get('expires_on') > moment(new Date().getTime()).unix()) {
+    //         console.log("works")        
+    //       } else {
+    //         return $http.post('http://127.0.0.1:8000/api/refresh').then(
+    //           response => {
+    //             const data = response.data;
+
+    //             token = data.token;
+    //             expires_in = data.expires_in;
+    //             // localStorageService.set('token');
+    //             localStorageService.set('token', token);
+    //             localStorageService.set('expires_in', expires_in); 
+    //           }, 
+    //           err => {
+    //             console.log('Error refreshing token ' + err)
+    //           }
+    //         );
+    //       }
+    //     }
+
+        // getAuthorizationHeader();
 
     function signup(name, email, password, onSuccess, onError) {
 
@@ -20,7 +97,7 @@ myApp.factory('loginService', ['$http', 'localStorageService', function($http, l
         }).
         then(function(response) {
 
-            localStorageService.set('token', response.data.token);
+            localStorageService.set('user', response.data.token);
             onSuccess(response);
 
         }, function(response) {
@@ -32,7 +109,7 @@ myApp.factory('loginService', ['$http', 'localStorageService', function($http, l
     }
 
     function login(email, password, onSuccess, onError){
-        $http.post('http://127.0.0.1:8000/api/auth/login', 
+        $http.post(`${address}/api/auth/login`, 
         {
             email: email,
             password: password
@@ -42,7 +119,10 @@ myApp.factory('loginService', ['$http', 'localStorageService', function($http, l
             // console.log(response.data.data);
             if(response.data.success === true){
                 // $scope.loginerror = response.data.message;
-                localStorageService.set('token', response.data.data);
+                
+                localStorageService.set('user', response.data.user);
+                localStorageService.set('token', response.data.token);
+                localStorageService.set('expires_in', response.data.expires_in);
             }
 
             // localStorageService.set('token', response.data);
@@ -56,18 +136,65 @@ myApp.factory('loginService', ['$http', 'localStorageService', function($http, l
 
     }
 
-    function logout(){
+    // function logout(){
 
+    //     localStorageService.remove('user');
+    //     localStorageService.remove('token');
+
+    // }
+
+    function logout(){
+        // $http.post(`${address}/api/auth/logout`
+        // ).success(function (response) {
+        //     console.log("logged out")
+
+        // }).error(function (err, status) {
+        //     console.log(err)
+        // });
+
+        // .then(function(response) {
+        //     onSuccess(response);
+        // }, function(response) {
+
+        //     onError(response);
+
+        // });
+
+        localStorageService.remove('user');
         localStorageService.remove('token');
+        localStorageService.remove('expires_in');
 
     }
 
+    
+    // function refresh(){
+    //     $http.get('http://127.0.0.1:8000/api/refresh', 
+    //     {
+    //         headers: {
+    //         "Authorization": 'Bearer ' + localStorageService.get('token')
+    //       }}).
+    //     then(function(response) {
+    //         // onSuccess(response);
+    //     }, function(response) {
+
+    //         // onError(response);
+
+    //     });
+
+    // }
+    // refresh();
+
+    // userlogout();
+
+    function getCurrentUser(){
+        return localStorageService.get('user');
+    }
     function getCurrentToken(){
         return localStorageService.get('token');
     }
 
     function updatestorage(data) {
-        localStorageService.set('token', data);
+        localStorageService.set('user', data);
     }
 
     return {
@@ -75,8 +202,11 @@ myApp.factory('loginService', ['$http', 'localStorageService', function($http, l
         signup: signup,
         login: login,
         logout: logout,
+        getCurrentUser: getCurrentUser,
         getCurrentToken: getCurrentToken,
-        updatestorage: updatestorage
+        updatestorage: updatestorage,
+        refreshToken: refreshToken,
+        // getAuthorizationHeader: getAuthorizationHeader
     }
 
 }]);

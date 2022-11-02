@@ -52,14 +52,14 @@
                 </div>
                 <button class="btn btn-sm btn-dark" ng-click="logout()">Logout</button> -->
             </header>
-            <div class="px-4 md-px-12" style="margin-top: 44px;">
+            <div class="px-4 md-px-12" style="margin-top: 44px;" ng-controller="mainController">
                 <h1>Overview</h1>
 
                 <div class="mt-4">
                     <div class="row">
                         <div class="col-lg-4 card-group">
                             <div class="card shadow-sm py-5 px-3">
-                                No of Users
+                                No of Users - {{userCount}}
                             </div>
                         </div>
                         <div class="col-lg-4 card-group">

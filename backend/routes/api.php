@@ -21,16 +21,51 @@ Route::get('/test', function () {
     return ['movie' => "Avengers"];
 });
 
-Route::post('users/create', 'UserController@store');
-Route::get('users', 'UserController@index');
-Route::get('users/students', 'UserController@noOfStudents');
-Route::get('users/parents', 'UserController@noOfParents');
-Route::get('users/{id}', 'UserController@show');
-Route::post('users/{id}/update', 'UserController@update');
-Route::post('users/{id}/delete', 'UserController@destroy');
+
+
+Route::group([
+
+    'middleware' => 'jwt.auth',
+    'prefix' => ''
+
+], function ($router) {
+
+    Route::post('me', 'Auth\LoginController@me');
+    Route::get('users', 'UserController@index');
+    Route::post('users/create', 'UserController@store');
+    Route::get('users/userCount', 'UserController@userCount');
+    Route::post('users/{id}/update', 'UserController@update');
+    Route::get('users/{id}', 'UserController@show');
+    Route::post('users/{id}/delete', 'UserController@destroy');
+
+    Route::post('auth/logout', 'Auth\LoginController@logout');
+    
+
+});
+
+Route::post('refresh', 'Auth\LoginController@refresh');
 
 
 Route::post('auth/login', 'Auth\LoginController@login');
+
+// Route::group(['prefix' => '', 'middleware' => 'jwt.auth'], function () {
+
+
+
+// });
+
+    
+    
+    // Route::get('users/students', 'UserController@noOfStudents');
+    // Route::get('users/parents', 'UserController@noOfParents');
+    
+
+// Route::middleware('jwt.refresh')->get('/token/refresh', 'Auth\LoginController@refresh');
+
+
+
+
+
 
 // Route::post('login', 'AuthApi@login');
 // Route::get('profile', 'AuthApi@getAuthenticatedUser');

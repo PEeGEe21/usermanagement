@@ -9,6 +9,8 @@ use App\Role;
 use App\Permissions\HasPermissionsTrait;
 // use DB;
 use Hash;
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 // use Illuminate\Support\Arr;
     
 class UserController extends Controller
@@ -19,6 +21,19 @@ class UserController extends Controller
     // {
     //     $this->middleware('cors');
     // }
+    
+
+    // protected $user;
+    // $user = JWTAuth::toUser($token);
+ 
+    public function __construct()
+    {
+        // $this->JWTAuth::parseToken()->authenticate();
+        // $this->middleware('JwtMiddleware');
+        // $this->middleware('jwt-auth');
+
+
+    }
 
     /**
      * Display a listing of the resource.
@@ -32,6 +47,12 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
+        
+        
+        // $token = JWTAuth::getToken();
+        // $user = JWTAuth::toUser($token);
+        // dd($token);
+        
         // $users = User::with('roles')->orderBy('id','ASC')->paginate(50);  
         // dd($users);
         // dd($request);
@@ -70,27 +91,37 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function noOfStudents(Request $request)
+    public function userCount(Request $request)
     {
         $students = User::whereHas(
             'roles', function($q){
                 $q->where('name', 'Student');
             }
         )->get()->count();
-        return response()->json(['students' => $students]);
-    }
 
-
-    public function noOfParents(Request $request)
-    {
         $parents = User::whereHas(
             'roles', function($q){
                 $q->where('name', 'Parent');
             }
         )->get()->count();
-        return response()->json(['parents' => $parents]);
+
+        // $userQuery->whereHas(
+        //     'roles', function($q){
+        //         $q->where('roles.id', '!=', Role::$admin);
+        //     }
+        // );
+        $users = User::count();
+
+        // $users = User::whereHas(
+        //     'roles', function($q){
+        //         $q->where('roles.id', '!=', Role::$admin);
+        //     }
+        // )->count();
+
+        return response()->json(['students' => $students, 'parents' => $parents, 'users' => $users]);
     }
-    
+
+
     /**
      * Store a newly created resource in storage.
      *
@@ -157,7 +188,12 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::with('roles')->find($id);
+            if (!$user){
+                return response()->json(['message'=> 'Failed, No available user']);
+            }
         return response()->json(['message'=> 'Successfull', 'user' => $user]);
+        
+        
 
     }
     
@@ -194,16 +230,34 @@ class UserController extends Controller
         $user = User::find($id);
 
 
+        // dd($request->input('role_id'));
+
         $user->update([
             'name'=>$request['name'],
             'email'=>$request['email'],
         ]);
+
+        // dd($request['role_id']);
         // $user->name = $request['name'];
         // $user->email = $request['email'];
         // $user->update();
         // if($user){
             // dd($user);
-            $user->roles()->sync($request->roles['0']['id'], $request->roles['0']['name']);
+            // $role = Role::find($request['role_id']);
+        
+
+            // $user->roles()->sync([$request->input('role_id')]);
+
+            if(!is_null($request['role_id'])){
+                $role = Role::find($request['role_id']);
+                $user->roles()->sync($role);
+            }
+            
+            
+            // $user->roles()->sync($request->roles['0']['id'], $request->roles['0']['name']);
+            // $user->roles()->sync($request->roles['0']['id'], $request->roles['0']['name']);
+            
+
 
         // }
         // dd($user);
@@ -263,12 +317,12 @@ class UserController extends Controller
         // DB::table('model_has_roles')->where('model_id',$id)->delete();
     
         // $user->assignRole($request->input('roles'));
-        $user = User::with('roles')->where('id','=',$id)->get();
-        $user = $user[0];
+        // $user = User::with('roles')->where('id','=',$id)->get();
+        // $user = $user[0];
 
         return response()->json([
             'message'=> 'User updated successfully', 
-            'user' => $user
+            // 'user' => $user
         ]);
 
     }
@@ -279,8 +333,12 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy( $id)
     {
+        // $token = JWTAuth::getToken();
+        // $user = JWTAuth::toUser($token);
+        // dd($token);
+
         User::find($id)->delete();
         return response()->json(['message'=> 'User deleted']);    
     }

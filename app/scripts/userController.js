@@ -1,5 +1,7 @@
-myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$timeout', 'loginService', function($scope, $http, $location, $q, $timeout, loginService){
+myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$timeout', 'loginService', function($scope, $http, $location, $q, $timeout, loginService,){
 
+
+  var address = 'http://usermanagement.test'
 
 
 
@@ -13,9 +15,15 @@ myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$time
 
 
     $scope.getItem = function(){
-      $scope.loggedInUser = loginService.getCurrentToken();
+      $scope.loggedInUser = loginService.getCurrentUser();
     }
     $scope.getItem();
+
+
+    $scope.getToken = function(){
+      $scope.loggedInToken = loginService.getCurrentToken();
+    }
+    $scope.getToken();
 
 
 
@@ -24,11 +32,11 @@ myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$time
     $scope.show = 'true'
     $scope.selected = []
 
-    $scope.limitOptions = [5, 10, 15, 25, 50];
+    $scope.limitOptions = [10, 15, 25, 50, 100];
 
     $scope.query = {
       order: 'name',
-      limit: 5,
+      limit: 10,
       page: 1,
       search: ''
     };
@@ -53,33 +61,57 @@ myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$time
       $scope.newUser.name = '';
       $scope.newUser.email = '';
       $scope.newUser.password = '';
+      $scope.newUser.cpassword = '';
       // $scope.newUser.roles.id = '';
     };
 
     $scope.addUser = function(){
 
-      console.log($scope.newUser.name);
-      $http.post('http://127.0.0.1:8000/api/users/create', {
-        name: $scope.newUser.name,
-        email: $scope.newUser.email,
-        password: $scope.newUser.password,
-        role_id: $scope.newUser.role_id,
-      }).success(function(res){
-        console.log(res);
-        alert(res.message);
+      // console.log($scope.newUser.name);
+
+      if($scope.newUser.password === $scope.newUser.cpassword){
         
-        if(res.success == true){
-          $scope.newUser = {};
-          $scope.resetForm();
-        }
-        // $scope.initPage();
-      }).error(function(data, status){
-        console.log(data);
-      })
+          
+
+        $http.post(`${address}/api/users/create`, {
+          name: $scope.newUser.name,
+          email: $scope.newUser.email,
+          password: $scope.newUser.password,
+          role_id: $scope.newUser.role_id,
+        }).success(function(res){
+          console.log(res, "saved user");
+          // alert(res.message);
+          
+          if(res.success === true){
+
+            // $scope.users.data.push( res.user);
+          $scope.getAllUsers(1,10);
+
+
+            alert(res.message);
+
+          // $scope.getAllUsers();
+            // $scope.loadStuff();
+
+            // $scope.newUser = {};
+            $scope.resetForm();
+          }else if(res.success === false){
+            alert(res.message);
+
+          }
+          // $scope.initPage();
+        }).error(function(data, status){
+          console.log(data);
+        })
+      }else(
+        alert('password must be the same')
+      )
+      
    
     }
 
     $scope.editUser = (user) => {
+
       $scope.existingUser = user;
     };
     
@@ -90,26 +122,44 @@ myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$time
       // $scope.newUser.roles.id = '';
     };
     $scope.saveUserEdit = function(user){
-      $http.post(`http://127.0.0.1:8000/api/users/${user.id}/update`, user).success(function(result){
-        var us = loginService.getCurrentToken();
-        if (us.id === user.id){
-          loginService.updatestorage(result.user);
-          window.location.reload();
-        }
+      $http.post(`${address}/api/users/${user.id}/update`, user)
+      .success(function(result){
+
+        // var us = loginService.getCurrentUser();
+        // if (us.id === user.id){
+        //   loginService.updatestorage(result.user);
+        //   window.location.reload();
+        // }           
         // $scope.initPage();
-        $scope.resetEditForm(user);
+        // $scope.resetEditForm();
+        alert("successfully updated")
+        $scope.getAllUsers(1,10);
+
       }).error(function(data, status){
         console.log(data);
       })
 
   }
 
-  $scope.deleteCrib = function(user){
-    var index = $scope.users.indexOf(user);
-    $scope.users.splice(index, 1)
+  $scope.deleteUser = function(user){
+    console.log(user.id);
 
-    $http.post(`http://127.0.0.1:8000/api/users/${user.id}/delete`).success(function(result){
-      // $scope.users = result.users.data
+    // var index = $scope.users.data.indexOf(user);
+    // console.log(index);
+
+    // $scope.users.data.splice(index, 1);
+
+
+    $http.post(`${address}/api/users/${user.id}/delete`).success(function(res){
+          // $scope.users = result.users.data
+          var index = $scope.users.data.indexOf(user);
+          $scope.users.data.splice(index, 1);
+
+          
+          $scope.getAllUsers(1,10);
+          alert(res.message);
+
+          
     }).error(function(data, status){
       console.log(data);
     })
@@ -118,11 +168,12 @@ myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$time
 
 
 
-  $scope.getAllUsers = function ( pageNumber = 1 , limit = 5, searchText = '' )
+  $scope.getAllUsers = function ( pageNumber = 1 , limit = 10, searchText = '' )
   {
       searchDefer = $q.defer();
 
-      var url = 'http://127.0.0.1:8000/api/users' + "?";
+      var url = `${address}/api/users` + "?"; 
+      
 
       url = url + '&page='+ pageNumber;
 
@@ -131,16 +182,23 @@ myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$time
       if(searchText)
           url = url + '&searchText=' + searchText;
 
-      $http.get(url)
-          .then(function(data) 
+
+
+
+      $http.get(url).then(function(data) 
           {
-            console.log(data.data.data, "hereee")
+            // console.log(data.data.data, "hereee")
             
             $scope.users = data.data;
               searchDefer.resolve(data.data);
           }, function(response) 
           {
               console.log('Something Went Wrong!', response);
+              if(response.status === 500){
+                $scope.logout();
+
+                window.location.reload();
+              }
           });
 
       return searchDefer.promise;
@@ -180,7 +238,7 @@ myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$time
                         var page = $scope.query.page;
                         var limit = $scope.query.limit;
                         var searchInput =  $scope.query.search;
-                        console.log($scope.query)
+                        // console.log($scope.query)
 
                         $scope.getAllUsers( page , limit, searchInput )
                         .then(function ( data )
@@ -192,10 +250,10 @@ myApp.controller('userController', ['$scope', '$http', '$location', '$q', '$time
 
                 $scope.loadStuff = function (){
                   $timeout(function (){
-                    $scope.getAllUsers(1,5)
+                    $scope.getAllUsers(1,10)
                   .then(function(data){
                       $scope.users =  data; 
-                      console.log($scope.users);
+                      // console.log($scope.users);
                     }); 
                   }, 500);
                 }

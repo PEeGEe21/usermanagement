@@ -1,6 +1,5 @@
-myApp.controller('loginController', ['$scope', '$http', '$location', 'loginService', function($scope, $http, $location, loginService){
+myApp.controller('loginController', ['$scope', '$http', '$location', 'loginService',  function($scope, $http, $location, loginService){
     $scope.name = 'PraiseGod'
-
 
 
 
@@ -19,7 +18,10 @@ myApp.controller('loginController', ['$scope', '$http', '$location', 'loginServi
                     // console.log(response);
                 },
                 function(response){
-                    alert('Something went wrong with the login process. Try again later!');
+                    $scope.loginerror = response.data.message;
+
+                    // alert('Something went wrong with the login process. Try again later!');
+                    // console.log(response)
                 }
             );
         }
@@ -32,3 +34,4 @@ myApp.controller('loginController', ['$scope', '$http', '$location', 'loginServi
     
 
 }]);
+
